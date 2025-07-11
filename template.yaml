@@ -59,6 +59,7 @@ spec:
       name: Génération des fichiers
       action: handlebars:template
       input:
+        url: './'
         # Applique Handlebars sur tous les fichiers générés
         # S'il y a un dossier 'skeleton', mettez 'targetPath: ./skeleton'
         # ou juste './' si les fichiers sont à la racine du template.
