@@ -1,0 +1,91 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: basic-service-template
+  title: Basic BOAZ-STUDY Service
+  description: Crée un nouveau service générique pour BOAZ-STUDY.
+  tags:
+    - recommended
+    - nodejs # Exemple de tag, adaptez
+    - service
+    - boaz-study
+spec:
+  owner: group:default/boaz-study-core-team # L'équipe par défaut qui possédera les services créés
+  type: service # Le type d'artefact que ce modèle crée
+
+  parameters:
+    - title: Informations sur le nouveau service
+      required:
+        - serviceName
+        - description
+        - owner
+      properties:
+        serviceName:
+          title: Nom du Service
+          type: string
+          description: Nom unique du nouveau service (utilisé pour le dépôt GitHub et l'entité Backstage).
+          ui:autofocus: true
+          ui:options:
+            rows: 1
+        description:
+          title: Description
+          type: string
+          description: Courte description du service.
+        owner:
+          title: Propriétaire
+          type: string
+          description: Groupe ou utilisateur Backstage propriétaire de ce service.
+          ui:field: OwnerPicker
+          ui:options:
+            allowedKinds: [Group, User]
+        repoUrl:
+          title: URL du Dépôt
+          type: string
+          ui:field: RepoUrlPicker
+          ui:options:
+            allowedHosts:
+              - github.com
+  steps:
+    - id: fetch-base
+      name: Récupération du squelette de base
+      action: fetch:plain
+      input:
+        # Cela clone le contenu du dossier './skeleton' de ce même template.
+        # Créez ce dossier juste après.
+        targetPath: ./
+        # from: ./skeleton # Utilisez from: './skeleton' si vous voulez un dossier squelette séparé
+
+    - id: generate-files
+      name: Génération des fichiers
+      action: handlebars:template
+      input:
+        # Applique Handlebars sur tous les fichiers générés
+        # S'il y a un dossier 'skeleton', mettez 'targetPath: ./skeleton'
+        # ou juste './' si les fichiers sont à la racine du template.
+        targetPath: ./
+
+    - id: publish
+      name: Publication sur GitHub
+      action: publish:github
+      input:
+        allowedHosts: ['github.com']
+        # Le repoUrl vient du formulaire
+        repoUrl: ${{ parameters.repoUrl }}
+        # Pour qu'il push le contenu généré par fetch:plain et handlebars:template
+        defaultBranch: main # Ou master
+        # Remplacez le owner par votre organisation GitHub si vous ne spécifiez pas dans RepoUrlPicker
+        # repoContents: ./ # Si le contenu à publier est dans un sous-dossier, sinon laissez vide
+        description: ${{ parameters.description }}
+        sourcePath: ./ # Chemin des fichiers à publier (par défaut, la racine du dossier temporaire)
+
+    - id: register
+      name: Enregistrement dans le catalogue Backstage
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps['publish'].output.repoContentsUrl }}
+        # Chemin vers le catalog-info.yaml DANS le dépôt du nouveau service créé
+        catalogInfoPath: '/catalog-info.yaml'
+
+  output:
+    url: ${{ steps['publish'].output.remoteUrl }}
+    entityRef: ${{ steps['register'].output.entityRef }}
