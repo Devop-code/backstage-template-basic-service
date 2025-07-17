@@ -1,4 +1,3 @@
-# template.yaml
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
@@ -50,9 +49,9 @@ spec:
   steps:
     - id: fetch-base-and-template
       name: Récupération et templating du squelette de base
-      action: **fetch:template** # <-- MODIFIÉ : Utilisez fetch:template pour le templating
+      action: fetch:template 
       input:
-        **url: ./skeleton** # <-- MODIFIÉ : Référence le dossier 'skeleton' à côté de ce template
+        url: ./skeleton 
         targetPath: ./ # Les fichiers templatisés seront placés à la racine du dossier de travail temporaire
         values: # <-- IMPORTANT : Passez ici les données pour le templating Nunjucks
           serviceName: ${{ parameters.serviceName }}
