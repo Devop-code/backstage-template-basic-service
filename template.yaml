@@ -50,7 +50,7 @@ spec:
       name: Récupération du squelette de base
       action: fetch:plain
       input:
-        url: ./skeleton
+        url: ./
         # Cela clone le contenu du dossier './skeleton' de ce même template.
         # Créez ce dossier juste après.
         targetPath: ./
