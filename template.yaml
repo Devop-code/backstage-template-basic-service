@@ -1,3 +1,4 @@
+# template.yaml
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
@@ -6,12 +7,12 @@ metadata:
   description: Crée un nouveau service générique pour BOAZ-STUDY.
   tags:
     - recommended
-    - nodejs # Exemple de tag, adaptez
+    - nodejs
     - service
     - boaz-study
 spec:
-  owner: group:default/boaz-study-core-team # L'équipe par défaut qui possédera les services créés
-  type: service # Le type d'artefact que ce modèle crée
+  owner: group:default/boaz-study-core-team
+  type: service
 
   parameters:
     - title: Informations sur le nouveau service
@@ -45,48 +46,43 @@ spec:
           ui:options:
             allowedHosts:
               - github.com
-  steps:
-    - id: fetch-base
-      name: Récupération du squelette de base
-      action: fetch:plain
-      input:
-        url: ./
-        # Cela clone le contenu du dossier './skeleton' de ce même template.
-        # Créez ce dossier juste après.
-        targetPath: ./
-        # from: ./skeleton # Utilisez from: './skeleton' si vous voulez un dossier squelette séparé
 
-    - id: generate-files
-      name: Génération des fichiers
-      action: handlebars:template
+  steps:
+    - id: fetch-base-and-template
+      name: Récupération et templating du squelette de base
+      action: **fetch:template** # <-- MODIFIÉ : Utilisez fetch:template pour le templating
       input:
-        url: './'
-        # Applique Handlebars sur tous les fichiers générés
-        # S'il y a un dossier 'skeleton', mettez 'targetPath: ./skeleton'
-        # ou juste './' si les fichiers sont à la racine du template.
-        targetPath: ./
+        **url: ./skeleton** # <-- MODIFIÉ : Référence le dossier 'skeleton' à côté de ce template
+        targetPath: ./ # Les fichiers templatisés seront placés à la racine du dossier de travail temporaire
+        values: # <-- IMPORTANT : Passez ici les données pour le templating Nunjucks
+          serviceName: ${{ parameters.serviceName }}
+          description: ${{ parameters.description }}
+          owner: ${{ parameters.owner }}
+          # Exemples de variables supplémentaires que vous pourriez vouloir passer
+          serviceNameKebabCase: ${{ parameters.serviceName | lower | replace(' ', '-') }}
+          # Ajoutez d'autres paramètres du formulaire si vous en avez besoin dans vos fichiers de squelette
+
+    # Supprimez l'action 'generate-files' avec 'handlebars:template' car 'fetch:template' s'en charge.
+    # Si vous avez besoin de traiter d'autres fichiers (non inclus dans le squelette initial)
+    # avec Nunjucks APRÈS la copie du squelette, vous pouvez ajouter une autre action 'fs:scaffold'
+    # ou 'fs:rename' si nécessaire, mais ce n'est généralement pas nécessaire pour un service basique.
 
     - id: publish
       name: Publication sur GitHub
       action: publish:github
       input:
         allowedHosts: ['github.com']
-        # Le repoUrl vient du formulaire
         repoUrl: ${{ parameters.repoUrl }}
-        # Pour qu'il push le contenu généré par fetch:plain et handlebars:template
-        defaultBranch: main # Ou master
-        # Remplacez le owner par votre organisation GitHub si vous ne spécifiez pas dans RepoUrlPicker
-        # repoContents: ./ # Si le contenu à publier est dans un sous-dossier, sinon laissez vide
+        defaultBranch: main
         description: ${{ parameters.description }}
-        sourcePath: ./ # Chemin des fichiers à publier (par défaut, la racine du dossier temporaire)
+        sourcePath: ./ # Assurez-vous que c'est le chemin des fichiers à publier
 
     - id: register
       name: Enregistrement dans le catalogue Backstage
       action: catalog:register
       input:
         repoContentsUrl: ${{ steps['publish'].output.repoContentsUrl }}
-        # Chemin vers le catalog-info.yaml DANS le dépôt du nouveau service créé
-        catalogInfoPath: '/catalog-info.yaml'
+        catalogInfoPath: '/catalog-info.yaml' # Assurez-vous que votre 'skeleton' inclut un catalog-info.yaml
 
   output:
     url: ${{ steps['publish'].output.remoteUrl }}
