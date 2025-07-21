@@ -7,7 +7,7 @@ metadata:
     github.com/project-slug: {{ parameters.repoUrl | parseRepoUrl 'owner' }}/{{ parameters.repoUrl | parseRepoUrl 'repo' }}
     backstage.io/techdocs-ref: url:./
 spec:
-  type: service # Ou 'website' si c'est pour un site
-  lifecycle: experimental # Ou production, development, etc.
-  owner: ${{ parameters.owner }}
-  system: boaz-study # Attache automatiquement au système BOAZ-STUDY
+  type: service
+  lifecycle: experimental
+  owner: {{ parameters.owner | dump }}
+  system: boaz-study
