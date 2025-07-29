@@ -42,9 +42,6 @@ spec:
           title: URL du Dépôt
           type: string
           ui:field: RepoUrlPicker
-          ui:options:
-            allowedHosts:
-              - github.com
 
   steps:
     - id: fetch-base-and-template
