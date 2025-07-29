@@ -4,10 +4,10 @@ metadata:
   name: {{ parameters.serviceName | dump }}
   description: {{ parameters.description | dump }}
   annotations:
-    github.com/project-slug: {{ parameters.repoUrl | parseRepoUrl 'owner' }}/{{ parameters.repoUrl | parseRepoUrl 'repo' }}
+    github.com/project-slug: '{{ parameters.repoUrl | parseRepoUrl "owner" }}/{{ parameters.repoUrl | parseRepoUrl "repo" }}'
     backstage.io/techdocs-ref: url:./
 spec:
   type: service
   lifecycle: experimental
-  owner: {{ parameters.owner | dump }}
+  owner: {{ owner | dump }}
   system: boaz-study
