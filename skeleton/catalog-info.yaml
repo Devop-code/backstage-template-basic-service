@@ -1,0 +1,13 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: {{ value.serviceName | dump }}
+  description: {{ value.description | dump }}
+  annotations:
+    github.com/project-slug: '{{ value.repoUrl | parseRepoUrl "owner" }}/{{ value.repoUrl | parseRepoUrl "repo" }}'
+    backstage.io/techdocs-ref: url:./
+spec:
+  type: service
+  lifecycle: experimental
+  owner: {{ owner | dump }}
+  system: boaz-study
