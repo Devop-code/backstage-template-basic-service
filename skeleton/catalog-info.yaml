@@ -4,7 +4,7 @@ metadata:
   name: ${{ parameters.serviceName | dump }}
   description: ${{ values.description | dump }}
   annotations:
-    github.com/project-slug: '${{ parameters.repoUrl | parseRepoUrl "owner" }}/${{ parameters.repoUrl | parseRepoUrl "repo" }}'
+    github.com/project-slug: ${{ parameters.repoUrl | parseRepoUrl "owner" }}/${{ parameters.repoUrl | parseRepoUrl "repo" }}
     backstage.io/techdocs-ref: url:./
 spec:
   type: service
