@@ -1,9 +1,9 @@
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
-  name: basic-service-template
+  name: basic-service-template-backstage
   title: Basic BOAZ-STUDY Service
-  description: Crée un nouveau service générique pour BOAZ-STUDY.
+  description: Crée un nouveau service générique pour BOAZ-STUDY pour backstage.
   tags:
     - recommended
     - nodejs
